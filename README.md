@@ -1,4 +1,5 @@
 since I use both windows and linux (WM no titlebar)
+I did hackly I'm NOT going to credit where credit is due
 I've added 2 seperate options for both.
 
 I'll add screenshots later.
