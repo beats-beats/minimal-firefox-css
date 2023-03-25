@@ -34,7 +34,6 @@ menupopup { border-radius: 0px !important }
   
 /* try increasing if you encounter problems */
 	--urlbar-height-setting: 24px;
-  --tab-min-height: 24px !important;
 /*	--tab-min-height: 16px !important; */
 }
 /*  --toolbarbutton-active-background: transparent !important; */
@@ -94,8 +93,6 @@ menupopup { border-radius: 0px !important }
 	overflow-clip-margin: 0px !important;
 }
 
-/* remove titlebar spacers */
-.titlebar-spacer { display: none !important; }
 
 /* disable tab shadow
 #tabbrowser-tabs:not([noshadowfortests]) .tab-background:is([selected], [multiselected]) {
