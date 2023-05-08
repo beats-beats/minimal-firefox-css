@@ -1,50 +1,161 @@
+/******************** BEGIN PYWALFOX CUSTOM CSS ********************/
+* {
+  --focus-outline-color: transparent !important;
+  --pywalfox-background: var(--lwt-accent-color) !important;
+  --pywalfox-text: var(--arrowpanel-color);
+  --pywalfox-text-focus: var(--toolbar-color);
+  --pywalfox-unselected-tab-opacity: 0.8;
+  --pywalfox-darker-background: var(--lwt-accent-color);
+  
+  --toolbar-color: var(--pywalfox-text) !important;
+  --toolbar-bgcolor: var(--pywalfox-background) !important;
+  --toolbarbutton-icon-fill: var(--pywalfox-text) !important;
+  --lwt-sidebar-text-color: var(--pywalfox-text) !important;
+  --lwt-sidebar-highlight-background-color: var(--pywalfox-background) !important;
+  --lwt-sidebar-highlight-text-color: var(--pywalfox-text) !important;
+ 
 
+  --lwt-toolbar-field-highlight: var(--pywalfox-text) !important;
+  --lwt-sidebar-background-color: var(--lwt-accent-color) !important;
+
+
+  --arrowpanel-background: var(--pywalfox-background) !important;
+  --arrowpanel-menuitem-padding: 0 10px !important;
+  --arrowpanel-menuitem-margin: 0 !important;
+  --arrowpanel-menuitem-padding-block: 5px  !important;
+  --arrowpanel-menuitem-padding-inline: 0 !important;
+  --arrowpanel-menuitem-margin-inline: 0 !important;
+  --arrowpanel-header-back-icon-padding: 0 !important;
+  --arrowpanel-header-info-icon-padding: 0 !important;
+  --arrowpanel-border-radius: 0 !important;
+  --arrowpanel-border-color: var(--pywalfox-text) !important;
+	--arrowpanel-menuitem-border-radius: 0 !important;
+  --arrowpanel-padding: 0 !important;
+  
+  --panel-subview-body-padding-block: 0 !important;
+  --panel-subview-body-padding-inline: 0 !important;
+  --panel-subview-body-padding: 0 !important;
+  --panel-separator-color: var(--pywalfox-text) !important;
+  --panel-separator-margin: 0 !important;
+  --panel-item-hover-bgcolor: var(--pywalfox-text) !important;
+  --panel-item-active-bgcolor: var(--pywalfox-text) !important;
+	--panel-border-radius: 0px !important;
+  
+  --urlbar-popup-hover-background: var(--pywalfox-text) !important;
+  --urlbar-background: var(--pywalfox-background) !important;
+  --urlbar-popup-hover-foreground: var(--pywalfox-background) !important;
+}
+
+/* right-click menu popup */
+menupopup > menuitem,
+menupopup > menu,
+menupopup > menucaption,
+#context-navigation > * {
+  -moz-appearance: none !important;
+  background-color: var(--pywalfox-background) !important;
+}
+
+menupopup > menuitem:not([disabled="true"]):hover,
+menupopup > menu:hover {
+	color: var(--pywalfox-background) !important;
+	background-color: var(--pywalfox-text) !important;
+}
+
+/* menu[_moz-menuactive="true"], menuitem[_moz-menuactive="true"],
+menucaption[_moz-menuactive="true"] {
+  color: var(--pywalfox-background) !important;
+	background-color: var(--pywalfox-text) !important;
+} */
+
+
+
+#context-navigation > .menuitem-iconic:not([disabled="true"]):hover {
+  background-color: var(--pywalfox-text) !important;
+  color: var(--pywalfox-background) !important;
+}
+
+/* navbar popup stuff  */
+:is(panelview .toolbarbutton-1, toolbarbutton.subviewbutton, .widget-overflow-list .toolbarbutton-1, .toolbaritem-combined-buttons:is(:not([cui-areatype="toolbar"]), [overflowedItem="true"]) > toolbarbutton):not([disabled]):hover {
+  color: var(--pywalfox-background) !important;
+  background-color: var(--panel-item-hover-bgcolor) !important;
+}
+
+.PanelUI-subView .subviewbutton-nav::after {
+  fill: var(--pywalfox-text) !important;
+  fill-opacity: 1 !important
+}
+
+.PanelUI-subView .subviewbutton-nav:hover:after {
+  fill: var(--pywalfox-background) !important;
+   fill-opacity: 1 !important
+}
+
+/********************* END PYWALFOX CUSTOM CSS *********************/
 /* Shapr UI corners */
-#urlbar-input-container > box:hover,
-#urlbar-input-container > box[open],
-#main-menubar >  menu,
-.titlebar-button:hover,
-#scrollbutton-up,
-#scrollbutton-down,
-.tab-close-button,
-.close-icon > image,
-#page-action-buttons > :hover,
-.toolbarbutton-icon,
-.panel-arrowcontent,
-.urlbarView-row-inner,
-.search-one-offs button,
-.tab-background,
-.subviewbutton-back,
-.toolbaritem-combined-buttons > toolbarbutton,
-#PopupSearchAutoComplete,
-menupopup { border-radius: 0px !important }
+* {
+  border-radius: 0 !important
+}
 
 :root {
   	/* I don't recommend you touch this unless you know what you're doing */
   --toolbarbutton-border-radius: 0px !important 
-	--arrowpanel-menuitem-padding: 2px !important;
-	--arrowpanel-border-radius: 0px !important;
-	--arrowpanel-menuitem-border-radius: 0px !important;
 	--toolbarbutton-border-radius: 0px !important;
-  --toolbarbutton-inner-padding: 0px 3px !important;
-  --toolbarbutton-hover-background: transparent !important;
-  --toolbarbutton-active-background: transparent !important;
-	--panel-border-radius: 0px !important;
-	--panel-padding: 0px !important;
-  
+	--toolbarbutton-inner-padding: 6px 6px !important;
+  --toolbarbutton-outer-padding: 0 !important; 
+  --toolbarbutton-hover-background: var(--pywalfox-text) !important;
+  --toolbarbutton-active-background: var(--pywalfox-text) !important;
+
 /* try increasing if you encounter problems */
-	--urlbar-height-setting: 22px;
-	--tab-min-height: 22px !important;
-  /*  --toolbarbutton-active-background: transparent !important; */
+	--urlbar-height-setting: 20px !important;
+	--tab-min-height: 20px !important;
   --lwt-tab-text: var(--lwt-accent-color) !important;
-	--toolbarbutton-inner-padding: 0px !important;
   --lwt-selected-tab-background-color: var(--lwt-text-color) !important;
+  --custom-font-size: 14px;
 }
-
-
 
 .tabbrowser-tab:is([selected], [multiselected]):-moz-lwtheme {
 	color: var(--lwt-tab-text, var(--toolbar-color));
+}
+
+
+/* bookmarkbar configuration */
+#PersonalToolbar {
+  max-height: 23px !important;
+	padding-inline: 0px !important;
+}
+
+#PersonalToolbar * {
+  font-size: 14px !important;
+}
+
+toolbarbutton.bookmark-item:not(.subviewbutton, [disabled="true"], [open]):hover,
+#tabbrowser-arrowscrollbox:not([scrolledtostart="true"])::part(scrollbutton-up):hover:active, #tabbrowser-arrowscrollbox:not([scrolledtoend="true"])::part(scrollbutton-down):hover:active, toolbarbutton.bookmark-item:hover:active:not(.subviewbutton, [disabled="true"]), toolbarbutton.bookmark-item[open="true"], toolbar .toolbarbutton-1:not([disabled="true"]):is([open], [checked], :hover:active) > .toolbarbutton-icon, toolbar .toolbarbutton-1:not([disabled="true"]):is([open], [checked], :hover:active) > .toolbarbutton-text, toolbar .toolbarbutton-1:not([disabled="true"]):is([open], [checked], :hover:active) > .toolbarbutton-badge-stack {
+    color: var(--pywalfox-background) !important;
+  	fill: var(--pywalfox-background) !important;
+}
+
+/* bookmark sidebar stuff */
+#sidebar-box, .sidebar-panel[lwt-sidebar] {
+  background-color: var(--pywalfox-background) !important;
+  color: var(--pywalfox-text) !important;
+}
+
+#sidebar-header {
+  border: 0 !important;
+  padding: 4px !important; 
+}
+.sidebar-splitter {
+	appearance: none;
+	width: 0;
+	border: 0 !important;
+}
+.hidevscroll-scrollbar.scrollbar-topmost {
+  display: none !important;
+}
+
+#sidebar-switcher-target:hover,  #sidebar-switcher-target[open="true"] {
+    color: var(--pywalfox-background) !important;
+    background-color: var(--pywalfox-text) !important;
 }
 
 /* --- DEBLOAT URLBAR ----------------------------------- */
@@ -115,8 +226,7 @@ tab {
 /* Delete the "private browsing" text in private window */
 #private-browsing-indicator-with-label > label {
   display: none;
-} 
-
+}
 
 /* remove space between urlbar and tabs*/
 .tab-background,.tab-content,.tab-stack {
@@ -124,8 +234,6 @@ tab {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
-
-
 
 /* make tab fill width */
 .tabbrowser-tab[fadein]:not([style^="max-width"]){ max-width: 100vw !important }
@@ -223,8 +331,6 @@ spacer[part="overflow-end-indicator"]{
     box-shadow: none !important;
 }
 
-
-
 /* remove dark space between pinned tab and first non-pinned tab */
 #tabbrowser-tabs[haspinnedtabs]:not([positionpinnedtabs]) >
 #tabbrowser-arrowscrollbox >
@@ -248,7 +354,7 @@ spacer[part="overflow-end-indicator"]{
 
 #TabsToolbar, .tabbrowser-tab {
 	max-height: var(--tab-min-height) !important;
-	font-size: 14px !important;
+	font-size: var(--custom-font-size) !important;
 }
 
 /* remove padding of between toolbar and tabs */
@@ -266,7 +372,7 @@ spacer[part="overflow-end-indicator"]{
 
 /* make extension icons smaller */
 #unified-extensions-view {
-	--uei-icon-size: 16px;
+	--uei-icon-size: 14px;
 }
 
 /* hide bloat */
@@ -277,38 +383,47 @@ spacer[part="overflow-end-indicator"]{
 	display: none !important;
 }
 
-
-
-/* reduce padding between the menu items */
-#unified-extensions-view > vbox > vbox > .unified-extensions-item { padding-block: 0px !important; }
-.unified-extensions-item-menu-button.subviewbutton { padding: 2px !important; }
-
-/* add 3px padding on the top and the bottom of the box */
-.panel-subview-body {
-	padding: 3px 0px !important;
+#unified-extensions-panel .unified-extensions-item {
+  margin: 0 !important;
+  padding:  0 !important;
 }
 
-/* experiment */
-toolbarbutton {
-  background-color: transparent;
+/* reduce padding between the menu items */
+ #unified-extensions-view > vbox > vbox > .unified-extensions-item {
+  margin: 0 !important;
+  padding: 0px !important;
+  padding-block: 0px !important;
+}
+.unified-extensions-item-menu-button.subviewbutton { 
+  margin: 0 !important;
+  padding: var(--arrowpanel-menuitem-padding-block) !important;
+}
+
+.toolbaritem-combined-buttons:is(:not([cui-areatype="toolbar"]), [overflowedItem="true"]) > toolbarbutton {
+  padding-block: var(--arrowpanel-menuitem-padding-block) !important;
+}
+
+/* ---- DOWNLOADS PANEL ----*/
+
+#downloadsPanel-blockedSubview, #downloadsPanel-mainView {
+	min-width: 30em !important;
+	padding: 0 !important;
+}
+
+#downloadsPanel-mainView > vbox:hover {
+  background-color: var(--pywalfox-text) !important;
+  color: var(--pywalfox-background) !important;
 }
 
 /* ---- URL BAR -------- */
-
-/* Make urlbar popup appear full size like it did before urlbar re-design */
-
-/* Temporary dummy variables, can probably be removed when Fx92 releases */
-:root{
-  --toolbar-field-background-color: var(--toolbar-field-non-lwt-bgcolor);
-  --toolbar-field-focus-background-color: var(--lwt-toolbar-field-focus,Field);
+#urlbar-container *{
+  border: 0 !important;
 }
-:root:-moz-lwtheme{
-  --toolbar-field-background-color: var(--lwt-toolbar-field-background-color);
-}
+
 
 .urlbarView-row-inner{
    /* This sets how far the dropdown-items are from window edge */
-  padding-inline-start: 6px !important;
+  padding-inline-start: 10px !important;
 }
 
 #urlbar-container,
@@ -319,10 +434,7 @@ toolbarbutton {
 #urlbar{
   height: auto !important;
   width: auto !important;
-  box-shadow: inset 0 0 0 1px var(--toolbar-field-border-color, hsla(240,5%,5%,.25));
-  background-color: var(--toolbar-field-background-color, hsla(0,0%,100%,.8));
-  border-radius: var(--toolbarbutton-border-radius);
-  --uc-urlbar-min-width: none; /* navbar_tabs_oneliner.css compatibility */
+  box-shadow: none !important;
 }
 
 #urlbar,
@@ -332,44 +444,24 @@ toolbarbutton {
   flex-grow: 1; /* Fx <112 compatibility */
 }
 
-#urlbar[focused]{ box-shadow: inset 0 0 0 1px var(--toolbar-field-focus-border-color, highlight); }
 
-.urlbarView{
+.urlbarView {
   position: absolute !important;
   margin: 0 !important;
   left: 0 !important;
   width: 100vw !important;
-  border-width: 1px 0;
+  border-width: 0;
   top: var(--urlbar-toolbar-height);
   background-color: var(--toolbar-field-focus-background-color, inherit);
   z-index: 4;
-  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+  box-shadow: none !important;
 }
 
 #urlbar > #urlbar-input-container{ padding: 0px !important; width: auto !important; height: auto !important; }
 #urlbar > #urlbar-background{ display: none !important; }
 
-/* This may seem pretty weird, but it gets around an issue where the height of urlbar may suddenly change when one starts typing into it */
-/* If you are otherwise modifying the urlbar height then you might need to modify the height of this too */
-#urlbar > #urlbar-input-container::before{ content: ""; display: flex; height: 24px; }
-
 /* Source file https://github.com/MrOtherGuy/firefox-csshacks/tree/master/chrome/minimal_text_fields.css made available under Mozilla Public License v. 2.0
 See the above repository for updates as well as full license text. */
-
-:root:not([customizing]){
-  --toolbar-field-background-color: transparent !important;
-  --toolbar-field-border-color: transparent !important;
-}
-
-#urlbar[open]{ background-color: var(--toolbar-bgcolor) !important; }
-
-#urlbar,
-#searchbar,
-#search-box{
-  -moz-appearance: none !important;
-  background-color: var(--toolbar-field-background-color) !important;
-  color: inherit !important;
-}
 
 #searchbar,
 #urlbar,
@@ -414,6 +506,40 @@ See the above repository for updates as well as full license text. */
 #identity-box > #identity-icon-labels{ transition: max-width 150ms linear !important; }
 #identity-box:not(:hover) > #identity-icon-labels{ max-width: 0px !important; }
 
+/* */
+#urlbar-container {
+  --urlbar-container-height: 0 !important;
+	margin-left: 5 !important;
+	margin-right: 0 !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+  padding-block 0 !important;
+	font-size: var(--custom-font-size) !important;
+}
+
+#urlbar {
+	--urlbar-toolbar-height: 32px !important;
+  top: 0 !important;
+	min-height: 0; !important;
+}
+/* */
+
+#urlbar-input-container {
+	border: 0 !important;
+}
+
+#urlbar-background {
+	border: 0 !important;
+}
+
+#nav-bar, #navigator-toolbox {
+	border: 0 !important;
+}
+
+.urlbarView-row { 
+  padding-block: 0 !important; 
+}
+
 
 /* Hides the first item in the urlbar dropdown if it is a "search with" or "visit" or "tab-to-search" item.  Does not hide "search in private window item", probably */
 
@@ -428,81 +554,39 @@ See the above repository for updates as well as full license text. */
   display: none !important;
 }
 
-
-/* Makes the window draggable from urlbar when urlbar is not focused. This means you can't click the urlbar text to activate it normally. But right-click works to activate urlbar. */
-/*
-.urlbar-input-box,#urlbar-input,#urlbar-scheme,#urlbar-container{
-  -moz-window-dragging: drag;
-  cursor: default;
-}
-#urlbar-input-container > box,
-#page-action-buttons,
-#urlbar-container:focus-within,
-#urlbar-container:focus-within :is(.urlbar-input-box,#urlbar-input,#urlbar-scheme,#urlbar-container){
-  -moz-window-dragging: no-drag;
-  cursor: auto;
-}
-*/
-
-
-
-/* --- STYLE NAVBAR ------------------------------------ */
-
-/* remove padding between toolbar buttons */
-toolbar .toolbarbutton-1 { padding: 0 0 !important; }
-
-/* add padding to the right of the last button so that it doesn't touch the edge of the window */
-#PanelUI-menu-button {
-	padding: 0px 0px 0px 0px !important;
+/* remove all borders for each item*/
+.urlbarView  *, .urlbarView-results {
+  border: 0 !important;
 }
 
-#nav-bar, #navigator-toolbox {
-	border-width: 0 !important;
-	--toolbar-field-focus-border-color: #3624ff;
+/* remove padding block */
+.urlbarView-results {
+  padding-block: 0 !important;
 }
 
-#urlbar-container {
-  --urlbar-container-height: var(--urlbar-height-setting) !important;
-	margin-left: 5 !important;
-	margin-right: 0 !important;
-	padding-top: 0 !important;
-	padding-bottom: 0 !important;
-  padding-block 0 !important;
-	font-size: 14px;
+/* remove "firefox suggest" */
+.urlbarView-row[label="Firefox Suggest"] {
+ display: none !important; 
+}
+
+/* remove the adapter thingi  */
+#identity-box[pageproxystate="valid"].notSecureText > .identity-box-button, #identity-box[pageproxystate="valid"].chromeUI > .identity-box-button, #identity-box[pageproxystate="valid"].extensionPage > .identity-box-button, #urlbar-label-box {
+  display: none !important;
+}
+
+/* results highlighing color */
+.urlbarView-row[selected], .urlbarView-row[row-selectable]:not([selected]):hover { 
+ background-color: var(--urlbar-popup-hover-background) !important;
+ color: var(--urlbar-popup-hover-foreground) !important;
+}
+
+.urlbarView-row {
+  background-color: var(--urlbar-background) !important;
 }
 
 
-#urlbar {
-	--urlbar-height: var(--urlbar-height-setting) !important;
-	--urlbar-toolbar-height: var(--urlbar-height-setting) !important;
-  top: 0 !important;
-	min-height: var(--urlbar-height-setting) !important;
-}
-
-#urlbar-input-container {
-	border-width: 0 !important;
-}
-
-#urlbar-background {
-	border-width: 0 !important;
-	border-radius: 0 !important;
-}
-
-#nav-bar, #navigator-toolbox {
-	border-width: 0 !important;
-}
-
-#urlbar-results, .urlbarView-row, .urlbarView-row-inner {
-  padding-top: 0px !important;
-  padding-bottom: 0px !important;
-  padding-block: 0px !important;
-}
-
-.urlbarView-row { padding-block: 0 !important; }
-
-
-/* hide urlbar unless focused */
-#nav-bar {
+/* hide urlbar unless focused
+ #nav-bar {
 	min-height: 0 !important;
 	max-height: 0 !important;
 	height: 0 !important;
@@ -510,7 +594,7 @@ toolbar .toolbarbutton-1 { padding: 0 0 !important; }
 	transform: scaleY(0) !important;
 }
 
-/* show on focus */
+show on focus
 #nav-bar:focus-within {
 	--moz-transform: scale(1) !important;
 	transform: scale(1) !important;
@@ -522,3 +606,26 @@ toolbar .toolbarbutton-1 { padding: 0 0 !important; }
 #navigator-toolbox:focus-within > .browser-toolbar {
 	transform: translateY(0);
 	opacity: 1;
+}
+
+ */
+/* --- STYLE NAVBAR ------------------------------------ */
+
+/* remove padding between toolbar buttons */
+toolbar .toolbarbutton-1 { 
+  padding: 0 !important;
+}
+
+/* figure it out bro :) */
+.toolbarbutton-1:hover {
+  fill: var(--pywalfox-background) !important;
+}
+
+#nav-bar, #navigator-toolbox {
+	border-width: 0 !important;
+}
+
+#stop-reload-button {
+  display: none !important;
+}
+
