@@ -112,6 +112,11 @@ tab {
 	margin: 0 !important;
 }
 
+/* remove titlebar spacers */
+.titlebar-spacer[type="pre-tabs"] {
+  display: none !important;
+}
+
 /* Tab: selected colors */
 #tabbrowser-tabs .tabbrowser-tab[selected] .tab-content {
 	background: var(--tab-active-bg-color) !important;
@@ -134,6 +139,12 @@ tab {
 .tab-close-button {
  display: none !important; 
 }
+
+/* remove silly furryfox pocket thing */
+#save-to-pocket-button {
+  display: none !important;
+}
+
 
 /* remove any border and shadows if any */
 arrowscrollbox * {
@@ -321,13 +332,26 @@ arrowscrollbox * {
 }
 
 /* remove "firefox suggest" */
-:root[lwt-toolbar-field-focus-brighttext] .urlbarView-row[label]::before {
-	opacity: 0 !important;
+
+
+/* remove search with google */
+.urlbarView-row[type="search_engine"] {
+  padding: 0 !important;
+  margin: 0 !important;
+  display: none !important;
 }
+
+.urlbarView-row[label="Firefox Suggest"] {
+  padding: 0 !important;
+  margin: 0 !important;
+  display: none !important;
+}
+
 
 /* hides "this time sesarch with" */
 #urlbar .search-one-offs {
   padding: 0 !important;
+  display: none !important;
   margin: 0 !important;
 }
 
@@ -476,6 +500,7 @@ toolbar .toolbarbutton-1 > .toolbarbutton-icon {
  	width: var(--icon-setting) !important;
 }
 
+
 /* I left the best for last [CODE STEALING & MODIFYING PRODIGY MOMENT] */
 
 /* Source file https://github.com/MrOtherGuy/firefox-csshacks/tree/master/chrome/page_action_buttons_on_urlbar_hover.css made available under Mozilla Public License v. 2.0
@@ -497,7 +522,7 @@ See the above repository for updates as well as full license text. */
 */
 
 /* auto-hide urlbar unless hovering overtabs or focusing urlbar by shortcut */
- #nav-bar {
+/*  #nav-bar {
     height: 0px !important;
     opacity: 0 !important;
     transition: 0.1s ease !important;
@@ -511,4 +536,4 @@ See the above repository for updates as well as full license text. */
 #navigator-toolbox:focus-within #nav-bar{
     height: var(--tab-height-setting) !important;
     opacity: 1 !important;
-}
+} */
