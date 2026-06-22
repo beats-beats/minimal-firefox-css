@@ -1,0 +1,417 @@
+/*
+ * ============================================================
+ *  userChrome.css — Minimal qutebrowser-style Firefox theme
+ * ============================================================
+ *
+ *  SETUP (required):
+ *    1. Go to about:config
+ *    2. Set  toolkit.legacyUserProfileCustomizations.stylesheets = true
+ *    3. Place this file at:
+ *         Windows : %APPDATA%\Mozilla\Firefox\Profiles\<profile>\chrome\userChrome.css
+ *         macOS   : ~/Library/Application Support/Firefox/Profiles/<profile>/chrome/userChrome.css
+ *         Linux   : ~/.mozilla/firefox/<profile>/chrome/userChrome.css
+ *    4. Restart Firefox fully (not just a new window)
+ *
+ *  HOW TO TOGGLE FEATURES:
+ *    Search for [TOGGLE] to find on/off switches.
+ *    To DISABLE: wrap the block in  /*  and  * /
+ *    To ENABLE:  remove those comment delimiters.
+ *
+ * ============================================================ */
+
+
+/* ============================================================
+ *  § 1  USER CONFIGURATION
+ *  All the knobs you're likely to want — edit here, not below.
+ * ============================================================ */
+
+:root {
+
+  /* ── Tabs ─────────────────────────────────────────────────── */
+  --tab-font-size:   0.8em;
+  --tab-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                     Helvetica, Arial, sans-serif;
+  --tab-height:      20px;
+
+  /* Maximum width of a single tab. Set to  none  for no limit. */
+  --max-tab-width: none;
+
+  /* ── Title-bar buttons (close / minimise / maximise) ──────── */
+  /* none = hidden  |  block = visible                           */
+  /* Must be  none  on macOS to fully hide the title bar.        */
+  --show-titlebar-buttons: none;
+
+  /* ── Toolbar & panel spacing ──────────────────────────────── */
+  --toolbar-start-end-padding:         0 !important;
+  --toolbarbutton-outer-padding:       0 !important;
+  --toolbar-field-background-color:    transparent !important;
+  --toolbar-field-focus-background-color: var(--toolbar-field-background-color) !important;
+  --toolbar-padding-inline:            0 !important;
+  --toolbarbutton-padding-outer:       0 !important;
+
+  /* ── Panel / popup menus ──────────────────────────────────── */
+  --panel-subview-body-padding:        0 !important;
+  --arrowpanel-menuitem-margin-block:  unset !important;
+  --arrowpanel-menuitem-margin-inline: var(--panel-subview-body-padding) !important;
+  --space-xsmall:                      var(--panel-subview-body-padding) !important;
+  --panel-menuitem-margin:             0 !important;
+}
+
+
+/* ============================================================
+ *  § 2  GLOBAL RESETS
+ *  Strips outlines, shadows, radii, and borders from every
+ *  chrome element for a completely flat look.
+ * ============================================================ */
+
+* {
+  outline:       none !important;
+  box-shadow:    none !important;
+  border-radius: 0    !important;
+  border:        0    !important;
+}
+
+/* Let panel headers collapse to zero height */
+panel {
+  --arrowpanel-header-min-height: unset !important;
+}
+
+/* Remove padding and shadow from all popup menus and panels */
+menupopup,
+panel {
+  --panel-padding-block: 0 !important;
+  --panel-shadow-margin: 0 !important;
+}
+
+/* Collapse all separator padding */
+menuseparator,
+panel toolbarseparator,
+toolbarseparator {
+  padding:       0 !important;
+  padding-block: 0 !important;
+}
+
+
+/* ============================================================
+ *  § 3  TITLE BAR
+ * ============================================================ */
+
+/* Remove native title-bar chrome so Firefox controls the drawing */
+#titlebar {
+  -moz-appearance: none !important;
+}
+
+/* [TOGGLE] Window control buttons (close / min / max).
+   Controlled by  --show-titlebar-buttons  in § 1. */
+.titlebar-buttonbox-container {
+  display: var(--show-titlebar-buttons);
+}
+
+/* Drag-space padding on non-maximised windows */
+:root[sizemode="normal"] #nav-bar {
+  --uc-window-drag-space-width: 20px;
+}
+
+/* The toolbox needs a non-none appearance so drag regions work */
+#navigator-toolbox {
+  appearance: toolbar !important;
+}
+
+/* [TOGGLE] Extra top padding on Windows 10 maximised windows.
+   Comment out if you're not on Windows 10. */
+@media (-moz-os-version: windows-win10) {
+  :root[sizemode="maximized"] #navigator-toolbox {
+    padding-top: 7px !important;
+  }
+}
+
+/* Fix: prevent menu bar height from animating on hover,
+   which can block the title bar from being draggable. */
+:root[tabsintitlebar] #toolbar-menubar[autohide="true"][inactive] {
+  transition: height 0ms steps(1) 80ms;
+}
+
+
+/* ============================================================
+ *  § 4  TAB BAR
+ * ============================================================ */
+
+/* Collapse the toolbar height so it wraps tightly around the tabs */
+#TabsToolbar {
+  min-height: 0 !important;
+}
+
+:root:not([customizing]) #TabsToolbar {
+  margin-inline: 1px !important;
+  border-radius: 0 !important;
+  padding:       0 !important;
+}
+
+/* Zero out heights on toolbar items that sit inside the tab bar */
+:root:not([customizing]) #tabbrowser-tabs .tabs-newtab-button,
+:root:not([customizing]) #tabs-newtab-button,
+:root:not([customizing]) #TabsToolbar-customization-target > .toolbarbutton-1,
+:root:not([customizing]) #TabsToolbar .titlebar-button {
+  -moz-appearance:  none !important;
+  height:           0px;
+  padding-top:      0px !important;
+  padding-bottom:   0px !important;
+  -moz-box-align:   stretch;
+  margin:           0 !important;
+}
+
+/* The scrollable container and tab list itself */
+#tabbrowser-tabs,
+#tabbrowser-tabs > .tabbrowser-arrowscrollbox,
+#tabbrowser-arrowscrollbox {
+  min-height: 0 !important;
+}
+
+/* Remove the leading gap/border before the first tab */
+#tabbrowser-tabs {
+  border-inline-start:  0 !important;
+  padding-inline-start: 0 !important;
+  margin-inline-start:  0 !important;
+}
+
+/* Hide the decorative pseudo-element before tab strip */
+#tabbrowser-tabs::before {
+  display: none !important;
+}
+
+/* Individual tab sizing and alignment */
+.tabbrowser-tab {
+  height:        var(--tab-height);
+  font-size:     var(--tab-font-size) !important;
+  min-height:    0 !important;
+  padding:       0 !important;
+  align-items:   center !important;
+  margin-bottom: 0 !important;
+}
+
+/* Reset margins and font on every element inside a tab */
+.tabbrowser-tab * {
+  margin:        0 !important;
+  border-radius: 0 !important;
+  font-family:   var(--tab-font-family) !important;
+}
+
+/* Honour the max-tab-width variable for unpinned tabs */
+.tabbrowser-tab[fadein]:not([pinned]) {
+  max-width: var(--max-tab-width) !important;
+}
+
+/* Tab favicon size */
+.tab-icon-image {
+  height:       auto !important;
+  width:        calc(var(--tab-height) / 1.5) !important;
+  margin-right: 4px !important;
+}
+
+/* Muted-tab icon shown in the label (before pseudo-element) */
+tab[muted] .tab-label::before {
+  background-image:  url("chrome://browser/skin/tabbrowser/tab-audio-muted-small.svg");
+  background-size:   100% 100%;
+  display:           inline-block;
+  min-width:         12px;
+  width:             var(--tab-font-size);
+  height:            auto;
+  content:           "\00a0";
+  position:          relative;
+  -moz-context-properties: fill, fill-opacity, stroke;
+  fill:              currentColor;
+  stroke:            transparent;
+  margin-right:      0.2em;
+}
+
+/* Hide the muted icon on hover (hover controls take over) */
+tab:hover[muted] .tab-label::before {
+  display: none;
+}
+
+/* [TOGGLE] Hide the tab bar when only one tab is open.
+   Comment out to always show the tab bar. */
+#tabbrowser-tabs tab:only-of-type {
+  visibility: collapse !important;
+}
+
+/* ── Accessibility & private-browsing indicators inside the tab bar ── */
+.accessibility-indicator,
+.private-browsing-indicator {
+  height: unset !important;
+}
+
+.accessibility-indicator > hbox {
+  padding-block: 0 !important;
+}
+
+
+/* ============================================================
+ *  § 5  TAB BAR — HIDDEN BUTTONS
+ *  [TOGGLE] Comment out individual rules to restore a button.
+ * ============================================================ */
+
+/* Per-tab close button */
+.tab-close-button { display: none !important; }
+
+/* New-tab "+" buttons (both the inline strip one and the standalone one) */
+#tabs-newtab-button,
+#tabbrowser-tabs .tabs-newtab-button,
+#new-tab-button { display: none !important; }
+
+/* "Show all tabs" chevron */
+#alltabs-button { display: none !important; }
+
+/* Left / right scroll arrows on the tab strip */
+#scrollbutton-up,
+#scrollbutton-down { display: none !important; }
+
+/* Audio-state secondary label on tabs */
+.tab-secondary-label { display: none !important; }
+
+/* Firefox View button (grid icon at far left) */
+#firefox-view-button { display: none !important; }
+
+/* Hover styles for new-tab buttons (used if you re-enable them above) */
+#tabs-newtab-button:hover,
+#tabbrowser-tabs .tabs-newtab-button:hover {
+  background-color: var(--toolbarbutton-hover-background);
+}
+
+#tabs-newtab-button > .toolbarbutton-icon,
+#tabbrowser-tabs .tabs-newtab-button > .toolbarbutton-icon {
+  padding:          0 !important;
+  transform:        scale(0.6);
+  background-color: transparent !important;
+}
+
+
+/* ============================================================
+ *  § 6  URL BAR / NAVIGATION BAR
+ *  The nav bar is hidden by default and appears when focused.
+ * ============================================================ */
+
+/* Remove all spacing around the URL bar container */
+#urlbar-container {
+  --urlbar-margin-inline:     0px !important;
+  --urlbar-padding-block:     0px !important;
+  --urlbar-container-padding: 0 !important;
+}
+
+/* Indent the text cursor slightly from the left edge */
+#urlbar-input {
+  padding-left: 8px !important;
+}
+
+/* Side gutters act as window-drag areas on non-maximised windows */
+#nav-bar {
+  border-inline: var(--uc-window-drag-space-width) solid var(--toolbar-bgcolor);
+}
+
+/* Keep URL bar action buttons the right height */
+.urlbar-page-action {
+  height: var(--urlbar-min-height) !important;
+}
+
+/* Prevent the URL bar from growing taller when it breaks out */
+.urlbar[breakout][breakout-extend] {
+  height: var(--urlbar-height) !important;
+}
+
+/* [TOGGLE] Auto-hide the nav bar — slides in on focus, hides when idle.
+   Comment out this entire block to keep the nav bar always visible. */
+:root:not([customizing]) #nav-bar,
+:root:not([customizing]) #urlbar[popover] {
+  pointer-events: none;
+  margin: 0 0 -32px !important;
+  opacity: 0 !important;
+}
+
+:root:not([customizing]) #nav-bar:focus-within,
+:root:not([customizing]) #urlbar[popover]:focus-within,
+:root:not([customizing]) #nav-bar:has(#urlbar[popover]:focus-within),
+:root:not([customizing]) #nav-bar:focus-within #urlbar[popover] {
+  pointer-events: auto;
+  margin: 0 0 auto !important;
+  opacity: 1 !important;
+}
+
+/* [TOGGLE] Hide search-engine shortcut rows from URL bar results.
+   Comment out to show them. */
+#urlbar-results > [type="search_engine"] {
+  display: none !important;
+}
+
+/* Tighten the padding inside the URL bar results list */
+#urlbar-results {
+  --urlbarView-results-padding: 0 !important;
+}
+
+
+/* ============================================================
+ *  § 7  NAV BAR — HIDDEN BUTTONS & INDICATORS
+ *  [TOGGLE] Comment out individual rules to restore any item.
+ * ============================================================ */
+
+/* Navigation buttons */
+#back-button,
+#forward-button,
+#reload-button,
+#stop-reload-button { display: none !important; }
+
+/* Identity / security zone and permission indicators */
+#tracking-protection-icon-container,
+#trust-icon-container,       /* [TOGGLE] remove this line to show the site-trust icon */
+#identity-icon-box,
+#identity-permission-box,
+#remote-control-box,
+#identity-box { display: none !important; }
+
+#trust-icon-container { height: unset !important; }
+
+/* The "go" arrow that appears while typing in the URL bar */
+#urlbar-go-button { display: none !important; }
+
+/* The URL bar results/suggestions dropdown */
+.urlbarView { display: none !important; }
+
+/* Search-mode switcher icon inside the URL bar */
+#urlbar-searchmode-switcher { display: none !important; }
+
+/* Picture-in-picture toggle button */
+#picture-in-picture-button { display: none !important; }
+
+/* Zoom-level percentage indicator */
+#urlbar-zoom-button { display: none !important; }
+
+/* Sidebar panel toggle */
+#sidebar-button { display: none !important; }
+
+/* Flexible spacers that push buttons apart */
+toolbarspring { display: none !important; }
+
+/* Favicon image shown inside the URL bar */
+img.urlbar-icon { display: none !important; }
+
+/* Main menu button (hamburger, separate from #PanelUI-button on some builds) */
+#main-button { display: none !important; }
+
+/* Titlebar spacer (can cause double spacing) */
+#titlebar spacer { display: none !important; }
+
+/* ── Fade-on-hover buttons ────────────────────────────────────
+   These are nearly invisible at rest and fade in on hover.
+   [TOGGLE] Set opacity to 1 to always show them.              */
+
+#taskbar-tabs-button,
+#star-button-box,
+#reader-mode-button-icon {
+  opacity:    0.01;
+  transition: opacity 0.3s ease-in-out;
+}
+
+#taskbar-tabs-button:hover,
+#star-button-box:hover,
+#reader-mode-button-icon:hover {
+  opacity: 1;
+}
