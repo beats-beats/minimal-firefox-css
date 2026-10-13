@@ -29,8 +29,6 @@
 
   /* ── Tabs ─────────────────────────────────────────────────── */
   --tab-font-size:   0.8em;
-  --tab-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                     Helvetica, Arial, sans-serif;
   --tab-height:      20px;
 
   /* Maximum width of a single tab. Set to  none  for no limit. */
@@ -48,7 +46,9 @@
   --toolbar-field-focus-background-color: var(--toolbar-field-background-color) !important;
   --toolbar-padding-inline:            0 !important;
   --toolbarbutton-padding-outer:       0 !important;
-
+  
+  --urlbar-background-color-focus: transparent !important;
+     --urlbar-container-padding-block: 0 !important;
   /* ── Panel / popup menus ──────────────────────────────────── */
   --panel-subview-body-padding:        0 !important;
   --arrowpanel-menuitem-margin-block:  unset !important;
@@ -65,6 +65,7 @@
  * ============================================================ */
 
 * {
+  font-family: monospace !important;
   outline:       none !important;
   box-shadow:    none !important;
   border-radius: 0    !important;
@@ -231,9 +232,9 @@ tab:hover[muted] .tab-label::before {
 
 /* [TOGGLE] Hide the tab bar when only one tab is open.
    Comment out to always show the tab bar. */
-#tabbrowser-tabs tab:only-of-type {
+/* #tabbrowser-tabs tab:only-of-type {
   visibility: collapse !important;
-}
+} */
 
 /* ── Accessibility & private-browsing indicators inside the tab bar ── */
 .accessibility-indicator,
@@ -320,12 +321,12 @@ tab:hover[muted] .tab-label::before {
 
 /* [TOGGLE] Auto-hide the nav bar — slides in on focus, hides when idle.
    Comment out this entire block to keep the nav bar always visible. */
-:root:not([customizing]) #nav-bar,
+/* :root:not([customizing]) #nav-bar,
 :root:not([customizing]) #urlbar[popover] {
   pointer-events: none;
   margin: 0 0 -32px !important;
   opacity: 0 !important;
-}
+} */
 
 :root:not([customizing]) #nav-bar:focus-within,
 :root:not([customizing]) #urlbar[popover]:focus-within,
@@ -374,6 +375,13 @@ tab:hover[muted] .tab-label::before {
 
 /* The URL bar results/suggestions dropdown */
 .urlbarView { display: none !important; }
+.urlbar-background { background: transparent !important;}
+.urlbar[popover-open] > .urlbar-background {
+  inset-inline: 0 !important;
+  inset-block: 0 !important;
+  inset-block-end: 0 !important;
+  clip-path: none !important;
+}
 
 /* Search-mode switcher icon inside the URL bar */
 #urlbar-searchmode-switcher { display: none !important; }
@@ -393,8 +401,9 @@ toolbarspring { display: none !important; }
 /* Favicon image shown inside the URL bar */
 img.urlbar-icon { display: none !important; }
 
-/* Main menu button (hamburger, separate from #PanelUI-button on some builds) */
-#main-button { display: none !important; }
+/* Google search button remove */
+/* #main-button { display: none !important; } */
+#main-button[title*="search engine"] { display: none !important;}
 
 /* Titlebar spacer (can cause double spacing) */
 #titlebar spacer { display: none !important; }
@@ -405,13 +414,19 @@ img.urlbar-icon { display: none !important; }
 
 #taskbar-tabs-button,
 #star-button-box,
-#reader-mode-button-icon {
+#reader-mode-button-icon,
+.urlbar-page-action[tooltiptext*="Translate"] {
   opacity:    0.01;
   transition: opacity 0.3s ease-in-out;
 }
 
+.urlbar-page-action {
+  background: transparent !important;
+}
+
 #taskbar-tabs-button:hover,
 #star-button-box:hover,
-#reader-mode-button-icon:hover {
+#reader-mode-button-icon:hover,
+.urlbar-page-action[tooltiptext*="Translate"]:hover {
   opacity: 1;
 }
