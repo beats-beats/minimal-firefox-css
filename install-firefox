@@ -1,0 +1,88 @@
+#!/bin/bash
+
+INI_FILE="$HOME/.config/mozilla/firefox/profiles.ini"
+BASE_DIR="$HOME/.config/mozilla/firefox"
+
+# 1. Find the current active installation default path
+ACTIVE_PATH=$(cat "$INI_FILE" | awk '/^\[Install/{flag=1;next} /^\[/{flag=0} flag' | grep '^Default=' | cut -d= -f2)
+
+# 2. Extract profile names and their paths into arrays
+mapfile -t PROFILES < <(cat "$INI_FILE" | grep -E '^Name=' | cut -d= -f2)
+mapfile -t PATHS < <(cat "$INI_FILE" | grep -E '^Path=' | cut -d= -f2)
+
+# 3. Format options dynamically (marking default)
+OPTIONS=()
+for i in "${!PROFILES[@]}"; do
+    if [ "${PATHS[$i]}" = "$ACTIVE_PATH" ]; then
+        OPTIONS+=("${PROFILES[$i]} [default]")
+    else
+        OPTIONS+=("${PROFILES[$i]}")
+    fi
+done
+
+# 4. Display options on explicit new lines
+echo "Select a Firefox profile:"
+for i in "${!OPTIONS[@]}"; do
+    echo "$((i+1))) ${OPTIONS[$i]}"
+done
+
+# Prompt loop using your PS3 prompt
+while true; do
+    read -rp "Please enter your choice (1-${#OPTIONS[@]}): " choice
+    if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#OPTIONS[@]}" ]; then
+        INDEX=$((choice-1))
+        SELECTED_PROFILE="${PROFILES[$INDEX]}"
+        SELECTED_PATH="${PATHS[$INDEX]}"
+        break
+    else
+        echo "Invalid selection. Please try again."
+    fi
+done
+
+# Build the absolute path to the target profile folder
+PROFILE_DIR="$BASE_DIR/$SELECTED_PATH"
+
+echo -e "\nSelected Profile: $SELECTED_PROFILE"
+echo "Profile Directory: $PROFILE_DIR"
+
+# 5. Ask for the custom raw user.js link
+DEFAULT_URL="https://raw.githubusercontent.com/yokoffing/Betterfox/refs/heads/main/user.js"
+echo -e "\nPress [ENTER] to use the default Betterfox user.js, or paste a custom raw GitHub link below:"
+read -rp "Link: " CUSTOM_URL
+
+# Fall back to default if empty
+FINAL_URL="${CUSTOM_URL:-$DEFAULT_URL}"
+
+# 6. Download user.js into the folder
+echo "Downloading user.js from: $FINAL_URL ..."
+if curl -sSL -o "$PROFILE_DIR/user.js" "$FINAL_URL"; then
+    echo "Successfully installed user.js to $PROFILE_DIR/user.js"
+else
+    echo "Error: Failed to download the user.js file. Please verify the URL."
+    exit 1
+fi
+
+# 7. Check if Firefox is running and prompt for a restart
+if pgrep -x "firefox" > /dev/null; then
+    echo -e "\nFirefox is currently running."
+    read -rp "Would you like to restart Firefox now to apply changes? (y/n): " restart_choice
+    case "$restart_choice" in
+        [Yy]* )
+            echo "Closing Firefox..."
+            pkill -x "firefox"
+            sleep 2 # Let it cleanly unmount files
+            echo "Reopening Firefox with profile '$SELECTED_PROFILE'..."
+            firefox -P "$SELECTED_PROFILE" &
+            ;;
+        * )
+            echo "Changes saved. Please manually restart Firefox later to apply the user.js configurations."
+            ;;
+    esac
+else
+    # If not running, ask if they want to launch it
+    read -rp "Firefox is closed. Launch it now with profile '$SELECTED_PROFILE'? (y/n): " launch_choice
+    if [[ "$launch_choice" =~ ^[Yy]*$ ]]; then
+        firefox -P "$SELECTED_PROFILE" &
+    fi
+fi
+
