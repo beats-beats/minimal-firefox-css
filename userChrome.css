@@ -148,6 +148,12 @@ toolbarseparator {
   padding:       0 !important;
 }
 
+/* Make private icon same height as the tab bar so that it leaves no weird gap between tabbar and navbar */
+.private-browsing-indicator-button.toolbarbutton-1 {
+	--toolbarbutton-icon-size: calc(var(--tab-height)) !important;
+	padding: 0 !important;
+}
+
 /* Zero out heights on toolbar items that sit inside the tab bar */
 :root:not([customizing]) #tabbrowser-tabs .tabs-newtab-button,
 :root:not([customizing]) #tabs-newtab-button,
