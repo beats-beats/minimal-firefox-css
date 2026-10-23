@@ -1,5 +1,5 @@
 qutebrowser like userchrome.css
-use tridactyl
+use tridactyl ensure that compact density in toolbar options is enabled
 
 added support for windows script (.ps1) and linux script (.sh) for installing :D
 
