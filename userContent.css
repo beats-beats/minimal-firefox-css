@@ -1,0 +1,87 @@
+/* Font: monospace everywhere except icons and math */
+*:not(
+  [class*="icon" i], [class*="symbol" i], [class*="material" i],
+  [class*="fa-" i], [class*="bi-" i], [class*="mdi" i], [class*="ion-" i],
+  .fa, .fas, .far, .fab, .fal, .fad, .bi,
+  [data-cds*="icon" i], [data-icon], [role="img"],
+  mat-icon, md-icon, sl-icon, ion-icon, iconify-icon,
+  [class*="katex" i], [class*="katex" i] *,
+  [class*="mathjax" i], mjx-container, mjx-container *,
+  math, math *
+) {
+  font-family: monospace, monospace,
+    "Font Awesome 6 Free", "Font Awesome 6 Brands",
+    "Font Awesome 5 Free", "Font Awesome 5 Brands", "FontAwesome",
+    "bootstrap-icons", "Material Design Icons", "Glyphicons Halflings" !important;
+}
+
+/* Shapes: flatten, but keep CSS-drawn UI pieces intact */
+*:not(
+  [class*="avatar" i], [class*="spinner" i], [class*="loader" i],
+  [class*="loading" i], [class*="badge" i], [class*="toggle" i],
+  [class*="switch" i], [class*="radio" i], [class*="marker" i],
+  [class*="dot" i]
+) {
+  border-radius: 0 !important;
+}
+
+*:not(:focus-visible) {
+  box-shadow: none !important;
+}
+
+* {
+  text-shadow: none !important;
+}
+
+/* Square everything, including pseudo-elements */
+*,
+*::before,
+*::after {
+  border-radius: 0 !important;
+}
+
+*:not(:focus-visible),
+*::before,
+*::after {
+  box-shadow: none !important;
+}
+
+/* Native control parts (keep separate: one unknown selector kills a whole rule) */
+::-moz-range-thumb,
+::-moz-range-track,
+::-moz-progress-bar,
+::-moz-meter-bar,
+::file-selector-button {
+  border-radius: 0 !important;
+}
+
+[data-slot="switch-thumb"] svg path {
+  d: path("M0 0H19V19H0Z M6.333 6.333V12.667H12.667V6.333Z") !important;
+  fill-rule: evenodd !important;
+}
+
+
+/* Circular image crops via clip-path or mask */
+img, picture, video,
+[class*="avatar" i] {
+  clip-path: none !important;
+  mask: none !important;
+}
+
+/* SVG rounded rectangles */
+rect {
+  rx: 0 !important;
+  ry: 0 !important;
+}
+
+
+input[type="radio"] {
+  appearance: none;
+  width: 1em;
+  height: 1em;
+  border: 1px solid currentColor;
+}
+
+input[type="radio"]:checked {
+  background: currentColor;
+}
