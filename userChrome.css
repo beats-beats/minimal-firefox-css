@@ -299,7 +299,7 @@ tab:hover[muted] .tab-label::before {
 }
 
 .tabbrowser-tab:not([selected]) {
-  animation: tab-fade-out 0.5s ease-in-out 0.5s forwards;
+  animation: tab-fade-out 0.5s ease-in-out 0.1s forwards;
 }
 
 /* Selected tab and hovered tabs stay at full opacity */
@@ -321,17 +321,8 @@ tab:hover[muted] .tab-label::before {
   --urlbar-container-padding: 0 !important;
 }
 
-#urlbar-input,
-#urlbar-scheme {
-  opacity: 0.4 !important;
-  transition: opacity 0.2s ease !important;
-}
-
-#urlbar:hover #urlbar-input,
-#urlbar:hover #urlbar-scheme,
-#urlbar[focused] #urlbar-input,
-#urlbar[focused] #urlbar-scheme {
-  opacity: 1 !important;
+#urlbar:not(:hover):not([focused]) #urlbar-input {
+  animation: tab-fade-out 0.5s ease-in-out 0.1s forwards;
 }
 
 /* Indent the text cursor slightly from the left edge */
@@ -478,15 +469,21 @@ img.urlbar-icon { display: none !important; }
    These are nearly invisible at rest and fade in on hover.
    [TOGGLE] Set opacity to 1 to always show them.              */
 
-#taskbar-tabs-button,
-#star-button-box,
-#reader-mode-button-icon,
-#PanelUI-button,
-#unified-extensions-button,
-#downloads-button,
-.urlbar-page-action[tooltiptext*="Translate"] {
-  opacity:    0.05;
-  transition: opacity 0.3s ease-in-out;
+@keyframes button-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0.05; }
+}
+
+:is(
+  #taskbar-tabs-button,
+  #star-button-box,
+  #reader-mode-button-icon,
+  #PanelUI-button,
+  #unified-extensions-button,
+  #downloads-button,
+  .urlbar-page-action[tooltiptext*="Translate"]
+):not(:hover) {
+  animation: button-fade-out 0.5s ease-in-out 0.1s forwards;
 }
 
 .urlbar-page-action {
@@ -501,4 +498,25 @@ img.urlbar-icon { display: none !important; }
 #downloads-button:hover,
 .urlbar-page-action[tooltiptext*="Translate"]:hover {
   opacity: 1;
+}
+
+
+:is(menupopup, panel):where(:not([type="arrow"])) {
+	--panel-background-color: unset !important;
+	--panel-border-color: unset !important;
+}
+
+/* normal items */
+menupopup :is(menu, menuitem):not([disabled="true"]):is(:hover, [_moz-menuactive], [open="true"]) {
+	background-color: var(--lwt-accent-color) !important;
+	color: var(--lwt-text-color) !important;
+}
+
+#clipboardReadPasteMenuPopup, #contentAreaContextMenu, #remoteBrowserTooltip, #aHTMLTooltip[contenttooltip] {
+  color-scheme: unset !important;
+}
+
+/* disabled items (e.g. "Copy Clean Link to Highlight") */
+menupopup :is(menu, menuitem)[disabled="true"]:is(:hover, [_moz-menuactive]) {
+	background-color: var(--lwt-accent-color) !important;
 }
