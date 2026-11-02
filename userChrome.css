@@ -292,6 +292,17 @@ tab:hover[muted] .tab-label::before {
   background-color: transparent !important;
 }
 
+/* Dim inactive tabs; full opacity for the selected tab or any hovered tab */
+.tabbrowser-tab:not([selected]) {
+  opacity: 0.35 !important;
+  transition: opacity 0.2s ease !important;
+}
+
+.tabbrowser-tab[selected],
+.tabbrowser-tab:not([selected]):hover {
+  opacity: 1 !important;
+}
+
 
 /* ============================================================
  *  § 6  URL BAR / NAVIGATION BAR
@@ -305,10 +316,52 @@ tab:hover[muted] .tab-label::before {
   --urlbar-container-padding: 0 !important;
 }
 
-/* Indent the text cursor slightly from the left edge */
-#urlbar-input {
-  padding-left: 8px !important;
+#urlbar-input,
+#urlbar-scheme {
+  opacity: 0.4 !important;
+  transition: opacity 0.2s ease !important;
 }
+
+#urlbar:hover #urlbar-input,
+#urlbar:hover #urlbar-scheme,
+#urlbar[focused] #urlbar-input,
+#urlbar[focused] #urlbar-scheme {
+  opacity: 1 !important;
+}
+
+/* Indent the text cursor slightly from the left edge */
+#urlbar-input, .urlbar-input-container {
+  padding-left: 0px !important;
+  padding-inline: 0px !important;
+}
+
+#urlbar-scheme {
+  display: none !important;
+}
+
+.urlbar-input-box {
+  margin: 0 !important;
+  text-align: center !important;
+}
+
+#urlbar-container {
+  position: absolute !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: min(60vw, 874px) !important;
+  margin: 0 !important;
+}
+
+#nav-bar-customization-target::after {
+  content: "" !important;
+  flex: 1 !important;
+  order: 1 !important;
+}
+
+#urlbar-container ~ * {
+  order: 2 !important;
+}
+
 
 /* Side gutters act as window-drag areas on non-maximised windows */
 #nav-bar {
@@ -372,7 +425,9 @@ tab:hover[muted] .tab-label::before {
 #identity-icon-box,
 #identity-permission-box,
 #remote-control-box,
-#identity-box { display: none !important; }
+#identity-box,
+#taskbar-tabs-button,
+#urlbar-revert-button-container { display: none !important; }
 
 #trust-icon-container { height: unset !important; }
 
@@ -421,8 +476,11 @@ img.urlbar-icon { display: none !important; }
 #taskbar-tabs-button,
 #star-button-box,
 #reader-mode-button-icon,
+#PanelUI-button,
+#unified-extensions-button,
+#downloads-button,
 .urlbar-page-action[tooltiptext*="Translate"] {
-  opacity:    0.01;
+  opacity:    0.05;
   transition: opacity 0.3s ease-in-out;
 }
 
@@ -433,6 +491,9 @@ img.urlbar-icon { display: none !important; }
 #taskbar-tabs-button:hover,
 #star-button-box:hover,
 #reader-mode-button-icon:hover,
+#PanelUI-button:hover,
+#unified-extensions-button:hover,
+#downloads-button:hover,
 .urlbar-page-action[tooltiptext*="Translate"]:hover {
   opacity: 1;
 }
