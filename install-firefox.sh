@@ -84,41 +84,63 @@ fetch_file() {
 
 # Helper: Firefox ignores userChrome.css and userContent.css unless this pref is on.
 # Called by both install steps so either file alone is enough to enable it.
+# Creates user.js if the user declined the user.js step, so the pref still lands somewhere.
 enable_legacy_stylesheets() {
-    if ! grep -qE '^\s*user_pref\("toolkit\.legacyUserProfileCustomizations\.stylesheets"' "$PROFILE_DIR/user.js"; then
-        printf '\n// Enable userChrome.css / userContent.css\nuser_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);\n' >> "$PROFILE_DIR/user.js"
+    local userjs="$PROFILE_DIR/user.js"
+    local pref='user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);'
+
+    # Already enabled — say nothing (keeps re-runs quiet)
+    if [ -f "$userjs" ] && grep -qE '^\s*user_pref\("toolkit\.legacyUserProfileCustomizations\.stylesheets"' "$userjs"; then
+        return 0
+    fi
+
+    if [ -f "$userjs" ]; then
+        printf '\n// Enable userChrome.css / userContent.css\n%s\n' "$pref" >> "$userjs"
         echo "Enabled userChrome.css / userContent.css support in user.js"
+    else
+        printf '// Created by the install script: enable userChrome.css / userContent.css\n%s\n' "$pref" > "$userjs"
+        echo "Created user.js containing only the userChrome.css / userContent.css pref"
     fi
 }
 
-# 5. Ask for the user.js source (link or local file)
+# 5. Ask whether to install a user.js at all
 DEFAULT_URL="https://raw.githubusercontent.com/yokoffing/Betterfox/refs/heads/main/user.js"
-echo -e "\nPress [ENTER] to use the default Betterfox user.js, or paste a raw GitHub link or a local file path (e.g. ~/Downloads/custom.js):"
+USERJS_INSTALLED=false
 
-# 6. Fetch it and install it as user.js (whatever the original file was called)
-USERJS_TMP=$(mktemp)
-while true; do
-    read -rp "Link or path: " USERJS_SRC
-    if [ -z "$USERJS_SRC" ]; then
-        USERJS_SRC="$DEFAULT_URL"
-        USING_DEFAULT=true
-    else
-        USING_DEFAULT=false
-    fi
+echo
+read -rp "Would you like to install a user.js too? (Y/n): " userjs_choice
+if [[ -z "$userjs_choice" || "$userjs_choice" =~ ^[Yy] ]]; then
 
-    if fetch_file "$USERJS_SRC" "$USERJS_TMP"; then
-        install -m 644 "$USERJS_TMP" "$PROFILE_DIR/user.js"
-        echo "Successfully installed user.js to $PROFILE_DIR/user.js"
-        break
-    elif $USING_DEFAULT; then
-        echo "Error: Failed to fetch the default user.js. Please check your connection."
-        rm -f "$USERJS_TMP"
-        exit 1
-    else
-        echo "Please try again, or press [ENTER] to use the default."
-    fi
-done
-rm -f "$USERJS_TMP"
+    # 6. Fetch it and install it as user.js (whatever the original file was called)
+    echo -e "\nPress [ENTER] to use the default Betterfox user.js, or paste a raw GitHub link or a local file path (e.g. ~/Downloads/custom.js):"
+
+    USERJS_TMP=$(mktemp)
+    while true; do
+        read -rp "Link or path: " USERJS_SRC
+        if [ -z "$USERJS_SRC" ]; then
+            USERJS_SRC="$DEFAULT_URL"
+            USING_DEFAULT=true
+        else
+            USING_DEFAULT=false
+        fi
+
+        if fetch_file "$USERJS_SRC" "$USERJS_TMP"; then
+            install -m 644 "$USERJS_TMP" "$PROFILE_DIR/user.js"
+            echo "Successfully installed user.js to $PROFILE_DIR/user.js"
+            USERJS_INSTALLED=true
+            break
+        elif $USING_DEFAULT; then
+            echo "Error: Failed to fetch the default user.js. Please check your connection."
+            rm -f "$USERJS_TMP"
+            exit 1
+        else
+            echo "Please try again, or press [ENTER] to use the default."
+        fi
+    done
+    rm -f "$USERJS_TMP"
+else
+    echo "Skipping user.js."
+fi
 
 # 7. Optionally install a userChrome.css
 DEFAULT_CSS_URL="https://raw.githubusercontent.com/beats-beats/minimal-firefox-css/refs/heads/main/userChrome.css"
@@ -218,11 +240,19 @@ else
 fi
 
 # 9. Build the summary of what was changed
-APPLIED_MSG="user.js"
+APPLIED_MSG=""
+$USERJS_INSTALLED  && APPLIED_MSG+=" + user.js"
 $CSS_INSTALLED     && APPLIED_MSG+=" + userChrome.css"
 $CONTENT_INSTALLED && APPLIED_MSG+=" + userContent.css"
+APPLIED_MSG="${APPLIED_MSG# + }"
 
-# 10. Check if Firefox is running and prompt for a restart
+# 10. If every step was declined there is nothing to restart
+if [ -z "$APPLIED_MSG" ]; then
+    echo -e "\nNothing was installed — no changes were made."
+    exit 0
+fi
+
+# 11. Check if Firefox is running and prompt for a restart
 if pgrep -x "firefox" > /dev/null; then
     echo -e "\nFirefox is currently running."
     read -rp "Would you like to restart Firefox now to apply changes? (y/n): " restart_choice
