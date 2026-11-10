@@ -41,6 +41,7 @@ done
 
 # Build the absolute path to the target profile folder
 PROFILE_DIR="$BASE_DIR/$SELECTED_PATH"
+CHROME_DIR="$PROFILE_DIR/chrome"
 
 echo -e "\nSelected Profile: $SELECTED_PROFILE"
 echo "Profile Directory: $PROFILE_DIR"
@@ -78,6 +79,15 @@ fetch_file() {
             echo "Error: could not copy the file."
             return 1
         fi
+    fi
+}
+
+# Helper: Firefox ignores userChrome.css and userContent.css unless this pref is on.
+# Called by both install steps so either file alone is enough to enable it.
+enable_legacy_stylesheets() {
+    if ! grep -qE '^\s*user_pref\("toolkit\.legacyUserProfileCustomizations\.stylesheets"' "$PROFILE_DIR/user.js"; then
+        printf '\n// Enable userChrome.css / userContent.css\nuser_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);\n' >> "$PROFILE_DIR/user.js"
+        echo "Enabled userChrome.css / userContent.css support in user.js"
     fi
 }
 
@@ -132,7 +142,6 @@ if [[ -z "$css_choice" || "$css_choice" =~ ^[Yy] ]]; then
         # Fetch to a temp file first so a failure never touches an existing userChrome.css
         if fetch_file "$CSS_SRC" "$CSS_TMP"; then
             # Create the chrome folder next to user.js
-            CHROME_DIR="$PROFILE_DIR/chrome"
             mkdir -p "$CHROME_DIR"
 
             # Keep a backup of any existing userChrome.css
@@ -146,10 +155,7 @@ if [[ -z "$css_choice" || "$css_choice" =~ ^[Yy] ]]; then
             CSS_INSTALLED=true
 
             # Firefox ignores userChrome.css unless this pref is enabled
-            if ! grep -qE '^\s*user_pref\("toolkit\.legacyUserProfileCustomizations\.stylesheets"' "$PROFILE_DIR/user.js"; then
-                printf '\n// Enable userChrome.css\nuser_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);\n' >> "$PROFILE_DIR/user.js"
-                echo "Enabled userChrome.css support in user.js"
-            fi
+            enable_legacy_stylesheets
             break
         elif $USING_DEFAULT; then
             echo "Error: Failed to fetch the default userChrome.css. Skipping it."
@@ -163,13 +169,60 @@ else
     echo "Skipping userChrome.css."
 fi
 
-# 8. Check if Firefox is running and prompt for a restart
-if $CSS_INSTALLED; then
-    APPLIED_MSG="user.js and userChrome.css"
+# 8. Optionally install a userContent.css
+DEFAULT_CONTENT_URL="https://raw.githubusercontent.com/beats-beats/minimal-firefox-css/refs/heads/main/userContent.css"
+CONTENT_INSTALLED=false
+
+echo
+read -rp "Would you like to install a userContent.css too? (Y/n): " content_choice
+if [[ -z "$content_choice" || "$content_choice" =~ ^[Yy] ]]; then
+    echo -e "\nPress [ENTER] to use the default userContent.css, or paste a raw GitHub link or a local file path (e.g. ~/Downloads/my-content.css):"
+
+    CONTENT_TMP=$(mktemp)
+    while true; do
+        read -rp "Link or path: " CONTENT_SRC
+        if [ -z "$CONTENT_SRC" ]; then
+            CONTENT_SRC="$DEFAULT_CONTENT_URL"
+            USING_DEFAULT=true
+        else
+            USING_DEFAULT=false
+        fi
+
+        # Fetch to a temp file first so a failure never touches an existing userContent.css
+        if fetch_file "$CONTENT_SRC" "$CONTENT_TMP"; then
+            mkdir -p "$CHROME_DIR"
+
+            # Keep a backup of any existing userContent.css
+            if [ -f "$CHROME_DIR/userContent.css" ]; then
+                cp "$CHROME_DIR/userContent.css" "$CHROME_DIR/userContent.css.bak"
+                echo "Existing userContent.css backed up to $CHROME_DIR/userContent.css.bak"
+            fi
+
+            install -m 644 "$CONTENT_TMP" "$CHROME_DIR/userContent.css"
+            echo "Successfully installed userContent.css to $CHROME_DIR/userContent.css"
+            CONTENT_INSTALLED=true
+
+            # Same pref as userChrome.css — enable it if this is the only file installed
+            enable_legacy_stylesheets
+            break
+        elif $USING_DEFAULT; then
+            echo "Error: Failed to fetch the default userContent.css. Skipping it."
+            break
+        else
+            echo "Please try again, or press [ENTER] to use the default."
+        fi
+    done
+    rm -f "$CONTENT_TMP"
 else
-    APPLIED_MSG="user.js"
+    echo "Skipping userContent.css."
 fi
 
+# 9. Build the summary of what was changed
+APPLIED_MSG="user.js"
+$CSS_INSTALLED     && APPLIED_MSG+=" + userChrome.css"
+$CONTENT_INSTALLED && APPLIED_MSG+=" + userContent.css"
+
+# 10. Check if Firefox is running and prompt for a restart
 if pgrep -x "firefox" > /dev/null; then
     echo -e "\nFirefox is currently running."
     read -rp "Would you like to restart Firefox now to apply changes? (y/n): " restart_choice
