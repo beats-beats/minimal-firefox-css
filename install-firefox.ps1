@@ -1,7 +1,8 @@
 # install-firefox.ps1 - Windows version of install-firefox
 #
-# Installs a user.js (Betterfox by default) and optionally a userChrome.css
-# into a Firefox profile. Each can come from a raw link or a local file path.
+# Installs a user.js (Betterfox by default), optionally a userChrome.css and a
+# userContent.css into a Firefox profile. Each file can come from a raw link or
+# a local file path, and each step can be skipped with (n).
 #
 # Run it with:
 #   powershell -ExecutionPolicy Bypass -File .\install-firefox.ps1
@@ -59,6 +60,32 @@ function Get-FileFromSource {
         Remove-Item -LiteralPath $Destination -Force -ErrorAction SilentlyContinue
         Write-Host "Error: could not copy the file."
         return $false
+    }
+}
+
+# Helper: Firefox ignores userChrome.css and userContent.css unless this pref is on.
+# Called by both CSS install steps so either file alone is enough to enable it.
+# Creates user.js if the user declined the user.js step, so the pref still lands somewhere.
+function Enable-LegacyStylesheets {
+    param([string]$UserJsPath)
+
+    $prefPattern = '^\s*user_pref\("toolkit\.legacyUserProfileCustomizations\.stylesheets"'
+    $prefText = 'user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);'
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+
+    # Already enabled - say nothing (keeps re-runs quiet)
+    if ((Test-Path -LiteralPath $UserJsPath) -and (Select-String -LiteralPath $UserJsPath -Pattern $prefPattern -Quiet)) {
+        return
+    }
+
+    if (Test-Path -LiteralPath $UserJsPath) {
+        $appendText = "`r`n// Enable userChrome.css / userContent.css`r`n$prefText`r`n"
+        [IO.File]::AppendAllText($UserJsPath, $appendText, $utf8NoBom)
+        Write-Host "Enabled userChrome.css / userContent.css support in user.js"
+    } else {
+        $createText = "// Created by the install script: enable userChrome.css / userContent.css`r`n$prefText`r`n"
+        [IO.File]::WriteAllText($UserJsPath, $createText, $utf8NoBom)
+        Write-Host "Created user.js containing only the userChrome.css / userContent.css pref"
     }
 }
 
@@ -158,6 +185,8 @@ while ($true) {
 
 $SelectedProfile = $Selected.Name
 $ProfileDir = $Selected.Dir
+$ChromeDir = Join-Path $ProfileDir 'chrome'
+$UserJsPath = Join-Path $ProfileDir 'user.js'
 
 if (-not (Test-Path -LiteralPath $ProfileDir -PathType Container)) {
     Write-Host "Error: profile folder not found: $ProfileDir"
@@ -168,32 +197,41 @@ Write-Host ""
 Write-Host "Selected Profile: $SelectedProfile"
 Write-Host "Profile Directory: $ProfileDir"
 
-# 5. Ask for the user.js source (link or local file)
+# 5. Ask whether to install a user.js at all
 $DefaultUrl = 'https://raw.githubusercontent.com/yokoffing/Betterfox/refs/heads/main/user.js'
+$UserJsInstalled = $false
+
 Write-Host ""
-Write-Host "Press [ENTER] to use the default Betterfox user.js, or paste a raw GitHub link or a local file path (e.g. ~\Downloads\custom.js):"
+$userJsChoice = Read-Host "Would you like to install a user.js too? (Y/n)"
+if ([string]::IsNullOrWhiteSpace($userJsChoice) -or $userJsChoice -match '^[Yy]') {
 
-# 6. Fetch it and install it as user.js (whatever the original file was called)
-$UserJsPath = Join-Path $ProfileDir 'user.js'
-$tmp = [IO.Path]::GetTempFileName()
-while ($true) {
-    $src = Read-Host "Link or path"
-    $usingDefault = [string]::IsNullOrWhiteSpace($src)
-    if ($usingDefault) { $src = $DefaultUrl }
+    # 6. Fetch it and install it as user.js (whatever the original file was called)
+    Write-Host ""
+    Write-Host "Press [ENTER] to use the default Betterfox user.js, or paste a raw GitHub link or a local file path (e.g. ~\Downloads\custom.js):"
 
-    if (Get-FileFromSource -Source $src -Destination $tmp) {
-        Copy-Item -LiteralPath $tmp -Destination $UserJsPath -Force
-        Write-Host "Successfully installed user.js to $UserJsPath"
-        break
-    } elseif ($usingDefault) {
-        Write-Host "Error: Failed to fetch the default user.js. Please check your connection."
-        Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue
-        exit 1
-    } else {
-        Write-Host "Please try again, or press [ENTER] to use the default."
+    $tmp = [IO.Path]::GetTempFileName()
+    while ($true) {
+        $src = Read-Host "Link or path"
+        $usingDefault = [string]::IsNullOrWhiteSpace($src)
+        if ($usingDefault) { $src = $DefaultUrl }
+
+        if (Get-FileFromSource -Source $src -Destination $tmp) {
+            Copy-Item -LiteralPath $tmp -Destination $UserJsPath -Force
+            Write-Host "Successfully installed user.js to $UserJsPath"
+            $UserJsInstalled = $true
+            break
+        } elseif ($usingDefault) {
+            Write-Host "Error: Failed to fetch the default user.js. Please check your connection."
+            Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue
+            exit 1
+        } else {
+            Write-Host "Please try again, or press [ENTER] to use the default."
+        }
     }
+    Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue
+} else {
+    Write-Host "Skipping user.js."
 }
-Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue
 
 # 7. Optionally install a userChrome.css
 $DefaultCssUrl = 'https://raw.githubusercontent.com/beats-beats/minimal-firefox-css/refs/heads/main/userChrome.css'
@@ -214,7 +252,6 @@ if ([string]::IsNullOrWhiteSpace($cssChoice) -or $cssChoice -match '^[Yy]') {
         # Fetch to a temp file first so a failure never touches an existing userChrome.css
         if (Get-FileFromSource -Source $cssSrc -Destination $cssTmp) {
             # Create the chrome folder next to user.js
-            $ChromeDir = Join-Path $ProfileDir 'chrome'
             New-Item -ItemType Directory -Path $ChromeDir -Force | Out-Null
             $CssPath = Join-Path $ChromeDir 'userChrome.css'
 
@@ -229,12 +266,7 @@ if ([string]::IsNullOrWhiteSpace($cssChoice) -or $cssChoice -match '^[Yy]') {
             $CssInstalled = $true
 
             # Firefox ignores userChrome.css unless this pref is enabled
-            $prefPattern = '^\s*user_pref\("toolkit\.legacyUserProfileCustomizations\.stylesheets"'
-            if (-not (Select-String -LiteralPath $UserJsPath -Pattern $prefPattern -Quiet)) {
-                $prefText = "`n// Enable userChrome.css`nuser_pref(`"toolkit.legacyUserProfileCustomizations.stylesheets`", true);`n"
-                [IO.File]::AppendAllText($UserJsPath, $prefText, (New-Object System.Text.UTF8Encoding($false)))
-                Write-Host "Enabled userChrome.css support in user.js"
-            }
+            Enable-LegacyStylesheets -UserJsPath $UserJsPath
             break
         } elseif ($usingDefault) {
             Write-Host "Error: Failed to fetch the default userChrome.css. Skipping it."
@@ -248,9 +280,67 @@ if ([string]::IsNullOrWhiteSpace($cssChoice) -or $cssChoice -match '^[Yy]') {
     Write-Host "Skipping userChrome.css."
 }
 
-# 8. Check if Firefox is running and prompt for a restart
-if ($CssInstalled) { $AppliedMsg = 'user.js and userChrome.css' } else { $AppliedMsg = 'user.js' }
+# 8. Optionally install a userContent.css
+$DefaultContentUrl = 'https://raw.githubusercontent.com/beats-beats/minimal-firefox-css/refs/heads/main/userContent.css'
+$ContentInstalled = $false
 
+Write-Host ""
+$contentChoice = Read-Host "Would you like to install a userContent.css too? (Y/n)"
+if ([string]::IsNullOrWhiteSpace($contentChoice) -or $contentChoice -match '^[Yy]') {
+    Write-Host ""
+    Write-Host "Press [ENTER] to use the default userContent.css, or paste a raw GitHub link or a local file path (e.g. ~\Downloads\my-content.css):"
+
+    $contentTmp = [IO.Path]::GetTempFileName()
+    while ($true) {
+        $contentSrc = Read-Host "Link or path"
+        $usingDefault = [string]::IsNullOrWhiteSpace($contentSrc)
+        if ($usingDefault) { $contentSrc = $DefaultContentUrl }
+
+        # Fetch to a temp file first so a failure never touches an existing userContent.css
+        if (Get-FileFromSource -Source $contentSrc -Destination $contentTmp) {
+            New-Item -ItemType Directory -Path $ChromeDir -Force | Out-Null
+            $ContentPath = Join-Path $ChromeDir 'userContent.css'
+
+            # Keep a backup of any existing userContent.css
+            if (Test-Path -LiteralPath $ContentPath) {
+                Copy-Item -LiteralPath $ContentPath -Destination "${ContentPath}.bak" -Force
+                Write-Host "Existing userContent.css backed up to $ContentPath.bak"
+            }
+
+            Copy-Item -LiteralPath $contentTmp -Destination $ContentPath -Force
+            Write-Host "Successfully installed userContent.css to $ContentPath"
+            $ContentInstalled = $true
+
+            # Same pref as userChrome.css - enable it if this is the only file installed
+            Enable-LegacyStylesheets -UserJsPath $UserJsPath
+            break
+        } elseif ($usingDefault) {
+            Write-Host "Error: Failed to fetch the default userContent.css. Skipping it."
+            break
+        } else {
+            Write-Host "Please try again, or press [ENTER] to use the default."
+        }
+    }
+    Remove-Item -LiteralPath $contentTmp -Force -ErrorAction SilentlyContinue
+} else {
+    Write-Host "Skipping userContent.css."
+}
+
+# 9. Build the summary of what was changed
+$Applied = @()
+if ($UserJsInstalled)  { $Applied += 'user.js' }
+if ($CssInstalled)     { $Applied += 'userChrome.css' }
+if ($ContentInstalled) { $Applied += 'userContent.css' }
+
+# 10. If every step was declined there is nothing to restart
+if ($Applied.Count -eq 0) {
+    Write-Host ""
+    Write-Host "Nothing was installed - no changes were made."
+    exit 0
+}
+$AppliedMsg = $Applied -join ' + '
+
+# 11. Check if Firefox is running and prompt for a restart
 $running = @(Get-Process -Name firefox -ErrorAction SilentlyContinue)
 if ($running.Count -gt 0) {
     Write-Host ""
